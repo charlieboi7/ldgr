@@ -1,0 +1,10 @@
+# secrets — never commit
+.smtp_secret
+*.env
+.env*
+
+# runtime logs
+*.log
+
+# OS noise
+.DS_Store

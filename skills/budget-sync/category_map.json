@@ -1,0 +1,25 @@
+{
+  "_comment": "Merchant keyword -> budget category. Keys are UPPERCASE substrings matched against the transaction merchant/description. First match wins; check longest/most-specific first. If nothing matches, the skill flags the transaction needs_review. The valid categories are listed in 'categories' and MUST match the dashboard's budgetCats and budget_sync.py's CATEGORIES exactly. This starter map covers common US merchants — your Claude agent should extend it with YOUR recurring merchants (your utility company, daycare, church, housekeeper, HOA, toll authority, etc.) learned from your statements.",
+  "categories": [
+    "Mortgage / rent","Childcare","School tuition","Car payment","Internet","Student loan",
+    "Insurance (life/pet/home)","Auto insurance","Phone","Financial advisor",
+    "Groceries","Electric","Water / trash","Restaurants","Amazon","Target",
+    "Misc / discretionary","Church / giving","Housekeeping","Pet care","Lawn care",
+    "Subscriptions","Kids' activities","Tolls"
+  ],
+  "rules": {
+    "ROCKET MORTGAGE": "Mortgage / rent", "MR. COOPER": "Mortgage / rent", "CHASE HOME": "Mortgage / rent", "WELLS FARGO HM": "Mortgage / rent", "US BANK HOME": "Mortgage / rent",
+    "TRADER JOE": "Groceries", "WHOLEFDS": "Groceries", "WHOLE FOODS": "Groceries", "KROGER": "Groceries", "ALDI": "Groceries", "SPROUTS": "Groceries", "COSTCO": "Groceries", "SAFEWAY": "Groceries", "PUBLIX": "Groceries", "H-E-B": "Groceries", "WALMART GROCERY": "Groceries",
+    "TST*": "Restaurants", "SQ *": "Restaurants", "DD *DOORDASH": "Restaurants", "DOORDASH": "Restaurants", "GRUBHUB": "Restaurants", "MCDONALD": "Restaurants", "CHICK-FIL-A": "Restaurants", "CHIPOTLE": "Restaurants", "STARBUCKS": "Restaurants", "PANERA": "Restaurants", "SONIC": "Restaurants", "WENDY": "Restaurants", "TACO BELL": "Restaurants",
+    "AMAZON": "Amazon", "AMZN": "Amazon",
+    "TARGET": "Target",
+    "TITHE.LY": "Church / giving", "PUSHPAY": "Church / giving",
+    "CHEWY": "Pet care", "PETCO": "Pet care", "PETSMART": "Pet care", "ANIMAL HOSPITAL": "Pet care", "VET": "Pet care",
+    "GEICO": "Auto insurance", "PROGRESSIVE": "Auto insurance", "STATE FARM": "Auto insurance",
+    "VERIZON": "Phone", "T-MOBILE": "Phone",
+    "COMCAST": "Internet", "XFINITY": "Internet", "SPECTRUM": "Internet",
+    "APPLE.COM": "Subscriptions", "OPENAI": "Subscriptions", "CLAUDE.AI": "Subscriptions", "ANTHROPIC": "Subscriptions", "PRIME VIDEO": "Subscriptions", "GOOGLE *": "Subscriptions", "PATREON": "Subscriptions", "NETFLIX": "Subscriptions", "SPOTIFY": "Subscriptions", "HULU": "Subscriptions", "DISNEY PLUS": "Subscriptions", "YOUTUBE": "Subscriptions"
+  },
+  "fallback": "NEEDS_REVIEW",
+  "note": "Excluded-by-user categories are NOT here on purpose (see docs/averages-methodology.md — e.g. travel, medical, one-time buys). If such merchants appear, flag needs_review so the user decides."
+}

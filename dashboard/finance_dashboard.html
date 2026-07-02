@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Household Finances · 2026</title>
+<style>
+  :root{
+    --ink:#eef1f7; --ink2:#9aa6bd; --muted:#5e6b86;
+    --paper:#080a10; --card:#10141e; --line:#222838;
+    --green:#5cc6a0; --green-soft:#0f2a22;
+    --amber:#c8a96a; --amber-soft:#2a2210;
+    --red:#d4806e; --red-soft:#2e1512;
+    --blue:#74c8d8; --blue-soft:#0c2630;
+    --need:#74c8d8;   /* ice */
+    --want:#c8a96a;   /* champagne gold */
+    --save:#9aa3d8;   /* refined indigo */
+    --neon:#c8a96a; --neon2:#74c8d8;   /* gold + ice accents */
+    --gold:#c8a96a;
+    --shadow:0 0 0 1px rgba(255,255,255,.025), 0 22px 48px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper);scroll-behavior:smooth}
+  body{
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,"Segoe UI",sans-serif;
+    color:var(--ink); line-height:1.5; padding:36px 20px 90px; position:relative;
+    background:
+      radial-gradient(1100px 560px at 82% -12%, rgba(200,169,106,.07), transparent 60%),
+      radial-gradient(950px 640px at -8% 108%, rgba(116,200,216,.055), transparent 55%),
+      var(--paper);
+    -webkit-font-smoothing:antialiased;
+  }
+  /* refined vignette only — no scanlines */
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9998;
+    background:radial-gradient(135% 135% at 50% 35%, transparent 58%, rgba(0,0,0,.5) 100%)}
+  .wrap{max-width:1080px;margin:0 auto;position:relative;z-index:1}
+  .tnum{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum";letter-spacing:-.01em}
+  h1{font-size:26px;font-weight:600;letter-spacing:.005em;color:#fff}
+  h1 .mark{color:var(--gold);font-weight:500}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+  .eyebrow::before{content:"◆ ";font-size:8px;vertical-align:middle;opacity:.8}
+  .sub{color:var(--ink2);font-size:13px;margin-top:5px;letter-spacing:.03em}
+  header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;margin-bottom:22px;
+    border-bottom:1px solid var(--line);padding-bottom:16px}
+
+  /* LDGR splash / loading screen */
+  #splash{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(120% 120% at 50% 38%, #12161f 0%, var(--paper) 70%);
+    transition:opacity .7s ease, visibility .7s ease}
+  #splash.hide{opacity:0;visibility:hidden}
+  .splash-inner{display:flex;flex-direction:column;align-items:center;gap:24px;
+    animation:splashPulse 1.8s ease-in-out infinite}
+  .ldgr-mark{width:132px;height:132px;filter:drop-shadow(0 0 22px rgba(116,200,216,.22)) drop-shadow(0 0 36px rgba(200,169,106,.12))}
+  .ldgr-word{display:flex;align-items:center;gap:16px;font-size:23px;font-weight:600;letter-spacing:.52em;
+    padding-left:.52em;background:linear-gradient(90deg,#eef1f7,#9fd2dd 45%,#c8a96a);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .ldgr-word .ln{width:38px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .ldgr-word .ln:last-child{background:linear-gradient(90deg,var(--gold),transparent)}
+  .splash-bar{width:190px;height:3px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+  .splash-fill{height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--neon2),var(--gold));
+    box-shadow:0 0 10px rgba(200,169,106,.4);animation:splashLoad 5s linear forwards}
+  @keyframes splashPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.06);opacity:1}}
+  @keyframes splashLoad{from{width:0}to{width:100%}}
+  @media (prefers-reduced-motion: reduce){.splash-inner{animation:none}}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+  .kpi{background:linear-gradient(180deg,rgba(116,200,216,.05),transparent),var(--card);
+    border:1px solid var(--line);border-radius:6px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon2),var(--neon))}
+  .kpi .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--blue);font-weight:700}
+  .kpi .val{font-size:25px;font-weight:700;margin-top:8px;letter-spacing:.01em;color:#fff}
+  .kpi .note{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:.03em}
+  .pos{color:var(--green)!important} .neg{color:var(--red)}
+  /* hover breakdown tooltip */
+  .kpi-hover{cursor:help;overflow:visible}
+  .kpi-hover .val::after{content:" ⓘ";font-size:12px;color:var(--blue);text-shadow:none;vertical-align:middle}
+  .tip{position:absolute;right:0;top:calc(100% + 12px);width:310px;background:#0b0e16;
+    border:1px solid var(--neon2);border-radius:8px;padding:14px 16px;
+    box-shadow:0 0 26px rgba(116,200,216,.3),0 20px 44px rgba(0,0,0,.65);
+    z-index:80;opacity:0;visibility:hidden;transform:translateY(-6px);transition:.18s;text-align:left}
+  .kpi-hover:hover .tip{opacity:1;visibility:visible;transform:none}
+  .tip::before{content:"";position:absolute;top:-6px;right:24px;width:11px;height:11px;background:#0b0e16;
+    border-left:1px solid var(--neon2);border-top:1px solid var(--neon2);transform:rotate(45deg)}
+  .tip h4{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--neon2);font-weight:700;margin-bottom:10px}
+  .tip .tr{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:6px 0;border-top:1px solid var(--line);color:var(--ink2)}
+  .tip .tr:first-of-type{border-top:0}
+  .tip .tr b{color:#fff;font-variant-numeric:tabular-nums}
+  .tip .tr.free b{color:var(--green)}
+  .tip .tr.tot{border-top:1px solid var(--neon2);margin-top:2px}
+  .tip .tr.tot span,.tip .tr.tot b{color:#fff;font-weight:700;font-size:13px}
+  .tip .tipfoot{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6;border-top:1px dashed var(--line);padding-top:9px}
+  .tip .tipfoot b{color:var(--green)}
+
+  /* tabs */
+  /* floating glass scroll-spy nav */
+  .tabs{position:sticky;top:12px;z-index:60;display:flex;gap:5px;margin:0 auto 34px;padding:7px;
+    width:fit-content;max-width:100%;flex-wrap:wrap;justify-content:center;
+    background:rgba(14,18,27,.74);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);
+    border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05)}
+  .tab{border:1px solid transparent;background:transparent;font:inherit;font-size:11px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink2);padding:9px 16px;border-radius:9px;cursor:pointer;transition:.2s;white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:linear-gradient(120deg,var(--gold),#dcc488);color:#0a0c12;border-color:transparent;
+    box-shadow:0 6px 16px rgba(200,169,106,.25)}
+  /* scroll progress bar */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:200;
+    background:linear-gradient(90deg,var(--neon2),var(--neon));box-shadow:0 0 10px var(--neon)}
+  /* tabbed panels */
+  .panel{display:none;animation:fade .28s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .section-title{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink2);margin:0 0 16px}
+  .section-title .sec-num{font-size:12px;font-weight:800;color:#0a0c12;background:linear-gradient(135deg,#dcc488,var(--gold));
+    width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.35)}
+  .section-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  /* scroll-reveal */
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(.2,.7,.2,1),transform .6s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  /* fluid value transitions + tactile hovers */
+  .fill,.gauge .g,.flowbar div{transition:width .7s cubic-bezier(.3,.8,.2,1),flex .7s cubic-bezier(.3,.8,.2,1)}
+  .gseg-g,.gseg-c{transition:height .7s cubic-bezier(.3,.8,.2,1)}
+  .kpi,.ms,.peak{transition:transform .25s ease,box-shadow .25s ease}
+  .kpi:hover,.ms:hover,.peak:hover{transform:translateY(-4px)}
+  .card{transition:box-shadow .3s ease}
+
+  .grid2{display:grid;grid-template-columns:1.3fr .9fr;gap:18px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px 22px;box-shadow:var(--shadow);position:relative}
+  .card h2{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;
+    color:#fff}
+  .card .cap{font-size:12px;color:var(--muted);margin-bottom:16px;letter-spacing:.02em}
+
+  /* bars list */
+  .row{display:grid;grid-template-columns:150px 1fr 88px;align-items:center;gap:12px;padding:5px 0}
+  .row .nm{font-size:12.5px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .amt{text-align:right;font-size:12.5px;font-weight:700;color:#fff}
+  .track{height:16px;background:#0b0e16;border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .fill{height:100%;border-radius:2px}
+  .fill.need{background:var(--need)}
+  .fill.want{background:var(--want)}
+  .fill.save{background:var(--save)}
+
+  /* donut */
+  .donutwrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .donut{width:180px;height:180px;border-radius:50%;position:relative;filter:drop-shadow(0 0 12px rgba(200,169,106,.35))}
+  .donut::after{content:"";position:absolute;inset:26px;background:var(--card);border-radius:50%;border:1px solid var(--line)}
+  .donut .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2}
+  .donut .ctr b{font-size:22px;font-weight:700;color:#fff} .donut .ctr span{font-size:10px;color:var(--muted);letter-spacing:.05em}
+  .legend{width:100%}
+  .legend .li{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:6px 0;border-top:1px solid var(--line);color:var(--ink2)}
+  .legend .li:first-child{border-top:0}
+  .dot{width:11px;height:11px;border-radius:2px;flex:none}
+  .legend .li .v{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;color:#fff}
+
+  .flowbar{display:flex;height:34px;border-radius:5px;overflow:hidden;margin:4px 0 14px;border:1px solid var(--line)}
+  .flowbar div{display:flex;align-items:center;justify-content:center;color:#0a0c12;font-size:11.5px;font-weight:700;min-width:0}
+
+  /* optimizer */
+  .opt-row{display:grid;grid-template-columns:22px 1.4fr 1.1fr 92px;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+  .opt-row:first-of-type{border-top:0}
+  .opt-row.off{opacity:.42}
+  .opt-row .onm{font-size:13px;font-weight:600;color:var(--ink)}
+  .opt-row .tag{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;padding:2px 7px;border-radius:3px;margin-left:7px;vertical-align:middle;border:1px solid}
+  .tag.need{background:var(--blue-soft);color:var(--need);border-color:var(--need)}
+  .tag.want{background:var(--red-soft);color:var(--want);border-color:var(--want)}
+  input[type=range]{width:100%;accent-color:var(--neon);cursor:pointer}
+  input[type=checkbox]{width:16px;height:16px;accent-color:var(--neon2);cursor:pointer}
+  .opt-row .ov{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:13px;color:#fff}
+  .opt-row .ov.cut{color:var(--green)}
+  .opt-summary{position:sticky;top:14px}
+  .bigstat{font-size:30px;font-weight:700;letter-spacing:.01em;color:#fff}
+  .deltabox{background:var(--green-soft);border:1px solid var(--green);border-radius:6px;padding:14px 16px;margin-top:14px;box-shadow:0 0 18px rgba(92,198,160,.15)}
+  .deltabox.zero{background:#0b0e16;border-color:var(--line);box-shadow:none}
+  .mini{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-top:1px dashed var(--line);color:var(--ink2)}
+  .mini b{color:#fff}
+  .mini:first-child{border-top:0}
+  .btn{font:inherit;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:9px 16px;border-radius:5px;cursor:pointer;margin-top:14px}
+  .btn:hover{border-color:var(--neon);color:var(--neon);box-shadow:0 0 14px rgba(200,169,106,.3)}
+
+  /* 50/30/20 */
+  .rule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .rule-card{border:1px solid var(--line);border-radius:8px;padding:20px;background:var(--card);box-shadow:var(--shadow)}
+  .rule-card .rh{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff}
+  .rule-card .pct-target{font-size:11px;color:var(--muted);margin:4px 0 16px;letter-spacing:.03em}
+  .gauge{height:12px;background:#0b0e16;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:6px;position:relative}
+  .gauge .g{height:100%;border-radius:5px}
+  .target-mark{position:absolute;top:-4px;width:2px;height:20px;background:#fff;opacity:.85;box-shadow:0 0 6px #fff}
+  .rule-card .actual{font-size:24px;font-weight:700;letter-spacing:.01em;color:#fff}
+  .rule-card .vs{font-size:12px;margin-top:3px;color:var(--muted)}
+  .savebd{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+  .sbd{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--ink2);padding:3px 0}
+  .sbd b{color:#fff;font-variant-numeric:tabular-nums}
+  .sbd.dim{opacity:.55}
+  .sbd.note{display:block;color:var(--muted);font-size:10.5px;margin-top:6px;border-top:1px dashed var(--line);padding-top:7px;line-height:1.5}
+  .verdict{margin-top:8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:5px 9px;border-radius:4px;display:inline-block;border:1px solid}
+  .v-over{background:var(--red-soft);color:var(--red);border-color:var(--red)}
+  .v-under{background:var(--blue-soft);color:var(--blue);border-color:var(--blue)}
+  .v-good{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+  /* peaks */
+  .peaks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .peak{border:1px solid var(--line);border-radius:6px;padding:16px;background:#0b0e16;position:relative;overflow:hidden}
+  .peak::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--want)}
+  .peak .pcat{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--want);font-weight:700}
+  .peak .pbig{font-size:30px;font-weight:700;color:#fff;margin-top:8px}
+  .peak .pslab{font-size:11.5px;color:var(--ink2);margin-top:1px}
+  .peak .pmonth{font-size:12.5px;color:var(--blue);margin-top:9px;font-weight:600}
+  .peak .pdet{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+  @media(max-width:820px){.peaks{grid-template-columns:1fr}}
+  .callout{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--neon);border-radius:6px;padding:16px 18px;margin-top:18px;font-size:13px;color:var(--ink2);box-shadow:var(--shadow);line-height:1.6}
+  .callout b{color:#fff}
+  /* net worth tab */
+  .nwline{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:9px 0;border-top:1px solid var(--line);color:var(--ink2)}
+  .nwline:first-child{border-top:0}
+  .nwline b{color:#fff;font-variant-numeric:tabular-nums}
+  .nwline.neg b{color:var(--red)}
+  .nwline.tot{border-top:1px solid var(--blue)} .nwline.tot b{font-weight:700}
+  .nwline.grand{border-top:1px solid var(--neon);margin-top:2px}
+  .nwline.grand span,.nwline.grand b{color:#fff;font-weight:700;font-size:15px}
+  /* growth tab */
+  .ctrls{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:6px}
+  .ctrl label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-weight:700;margin-bottom:11px}
+  .ctrl label b{float:right;color:#fff;text-transform:none;letter-spacing:0;font-size:13px}
+  .presets{display:flex;gap:6px;margin-bottom:11px}
+  .pbtn{flex:1;font:inherit;font-size:10.5px;font-weight:700;letter-spacing:.03em;border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:8px 4px;border-radius:5px;cursor:pointer;transition:.15s}
+  .pbtn:hover{border-color:var(--neon2);color:var(--neon2)}
+  .pbtn.active{background:linear-gradient(90deg,var(--neon),var(--neon2));color:#0a0c12;border-color:transparent;box-shadow:0 0 12px rgba(200,169,106,.4)}
+  .milestones{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .ms{border:1px solid var(--line);border-radius:8px;padding:18px;background:var(--card);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .ms::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--save),var(--neon2))}
+  .ms .yr{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--save);font-weight:700}
+  .ms .tot{font-size:25px;font-weight:700;color:#fff;margin-top:8px;letter-spacing:.01em}
+  .ms .br{font-size:11.5px;color:var(--ink2);margin-top:8px;display:flex;justify-content:space-between}
+  .ms .br b{color:#fff;font-variant-numeric:tabular-nums}
+  .ms .br.grow b{color:var(--green)}
+  .gchart{display:flex;align-items:flex-end;gap:14px;margin-top:10px}
+  .gcol{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+  .gcol .gval{font-size:11px;color:#fff;font-weight:700;margin-bottom:7px;font-variant-numeric:tabular-nums}
+  .gseg-g,.gseg-c{width:100%}
+  .gseg-g{background:var(--green);border-radius:4px 4px 0 0}
+  .gseg-c{background:var(--save)}
+  .gcol .glab{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.05em}
+  @media(max-width:820px){.ctrls{grid-template-columns:1fr}.milestones{grid-template-columns:1fr 1fr}}
+  /* budget tab */
+  .bsum{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .bgrouphdr{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold);font-weight:700;margin:20px 0 4px}
+  .bgrouphdr:first-child{margin-top:6px}
+  .brow{display:grid;grid-template-columns:172px 104px 1fr 152px;align-items:center;gap:14px;padding:9px 0;border-top:1px solid var(--line)}
+  .brow:first-of-type{border-top:0}
+  .bname{font-size:12.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bicell{display:flex;align-items:center;gap:4px;background:#0b0e16;border:1px solid var(--line);border-radius:6px;padding:0 10px;transition:border-color .15s}
+  .bicell:focus-within{border-color:var(--gold)}
+  .bicell .cur{color:var(--muted);font-size:12px}
+  .binput{width:100%;background:transparent;border:0;color:#fff;font:inherit;font-size:13px;font-variant-numeric:tabular-nums;padding:7px 0;text-align:right}
+  .binput::placeholder{color:var(--muted);opacity:.55;font-style:italic}
+  .binput:focus{outline:none}
+  .binput::-webkit-outer-spin-button,.binput::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .binput[type=number]{-moz-appearance:textfield}
+  .bm-track{height:14px;background:#0b0e16;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .bm-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.3,.8,.2,1)}
+  .bm-under{background:var(--need)} .bm-warn{background:var(--gold)} .bm-over{background:var(--red)}
+  .bm-amt{text-align:right;font-size:11.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
+  .bm-amt .over{color:var(--red);font-weight:700}
+  .bio{width:100%;margin-top:12px;background:#0b0e16;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;line-height:1.5;padding:10px;min-height:70px;resize:vertical}
+  .bio:focus{outline:none;border-color:var(--gold)}
+  @media(max-width:820px){.bsum{grid-template-columns:repeat(2,1fr)}.brow{grid-template-columns:1fr 92px;row-gap:8px}.brow .bm-track,.brow .bm-amt{grid-column:1/3}}
+  .foot{margin-top:34px;font-size:11px;color:var(--muted);text-align:center;line-height:1.8;letter-spacing:.02em}
+  @media(max-width:820px){
+    .kpis{grid-template-columns:repeat(2,1fr)} .grid2{grid-template-columns:1fr}
+    .rule-grid{grid-template-columns:1fr} .opt-row{grid-template-columns:22px 1fr 92px}
+    .opt-row .slidecell{display:none} .row{grid-template-columns:120px 1fr 76px}
+  }
+</style>
+</head>
+<body>
+<div id="splash" aria-hidden="true">
+  <div class="splash-inner">
+    <svg class="ldgr-mark" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LDGR">
+      <defs>
+        <linearGradient id="ldgrGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#eef1f7"/>
+          <stop offset="48%" stop-color="#8fcad8"/>
+          <stop offset="100%" stop-color="#c8a96a"/>
+        </linearGradient>
+      </defs>
+      <path d="M62 48 H104 a52 52 0 0 1 0 104 H62 V76" fill="none" stroke="url(#ldgrGrad)" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"/>
+      <rect x="46" y="48" width="11" height="104" rx="3" fill="url(#ldgrGrad)"/>
+      <rect x="84" y="116" width="11" height="26" rx="2" fill="url(#ldgrGrad)"/>
+      <rect x="100" y="104" width="11" height="38" rx="2" fill="url(#ldgrGrad)"/>
+      <rect x="116" y="90" width="11" height="52" rx="2" fill="url(#ldgrGrad)"/>
+    </svg>
+    <div class="ldgr-word"><span class="ln"></span>L D G R<span class="ln"></span></div>
+    <div class="splash-bar"><div class="splash-fill"></div></div>
+  </div>
+</div>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Private Wealth Overview</div>
+      <h1>Household <span class="mark">Finances</span></h1>
+      <div class="sub">Monthly snapshot · based on your parsed statements</div>
+    </div>
+    <div class="sub tnum" id="asof"></div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="lab">Net Income</div><div class="val tnum" id="k-income"></div><div class="note">after-tax · reaches checking</div></div>
+    <div class="kpi"><div class="lab">Total Expenses</div><div class="val tnum" id="k-exp"></div><div class="note" id="k-exp-n"></div></div>
+    <div class="kpi"><div class="lab">Surplus</div><div class="val tnum pos" id="k-surplus"></div><div class="note">before extra savings</div></div>
+    <div class="kpi kpi-hover" id="kpi-savings"><div class="lab">Savings Rate</div><div class="val tnum" id="k-rate"></div><div class="note">of gross · incl. 401k + match</div><div class="tip" id="savetip"></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-t="overview">Overview</button>
+    <button class="tab" data-t="optimizer">Optimize</button>
+    <button class="tab" data-t="misc">Misc</button>
+    <button class="tab" data-t="rule">50/30/20</button>
+    <button class="tab" data-t="growth">Growth</button>
+    <button class="tab" data-t="networth">Net Worth</button>
+    <button class="tab" data-t="budget">Budget</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <section class="panel active" id="overview">
+    <div class="section-title"><span class="sec-num">01</span> Overview</div>
+    <div class="card" style="margin-bottom:18px">
+      <h2>Income → Expenses → Surplus</h2>
+      <div class="cap">Where every after-tax dollar goes each month</div>
+      <div class="flowbar" id="flow"></div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap;font-size:13px;color:var(--ink2)">
+        <span><b style="color:var(--need)">●</b> Needs <b class="tnum" id="f-need"></b></span>
+        <span><b style="color:var(--want)">●</b> Wants <b class="tnum" id="f-want"></b></span>
+        <span><b style="color:var(--muted)">●</b> Surplus <b class="tnum" id="f-surp"></b></span>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>Expense Breakdown</h2>
+        <div class="cap">All recurring monthly categories, largest first</div>
+        <div id="bars"></div>
+      </div>
+      <div class="card">
+        <h2>Needs vs Wants vs Savings</h2>
+        <div class="cap">Share of net income</div>
+        <div class="donutwrap">
+          <div class="donut" id="donut"><div class="ctr"><b class="tnum" id="d-ctr"></b><span>of income spent</span></div></div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPTIMIZER -->
+  <section class="panel" id="optimizer">
+    <div class="section-title"><span class="sec-num">02</span> Expense Optimizer</div>
+    <div class="grid2">
+      <div class="card">
+        <h2>Adjust Your Spending</h2>
+        <div class="cap">Toggle a category off, or drag to reduce it. Needs are kept separate from wants — trim wants first.</div>
+        <div id="optlist"></div>
+        <button class="btn" id="reset">↺ Reset to current</button>
+      </div>
+      <div class="card opt-summary">
+        <h2>What-If Result</h2>
+        <div class="cap">Live recalculation</div>
+        <div style="margin:10px 0 4px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600">New Monthly Expenses</div>
+        <div class="bigstat tnum" id="o-exp"></div>
+        <div class="deltabox zero" id="o-deltabox">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;color:var(--green)">Monthly Savings</div>
+          <div class="bigstat tnum" id="o-cut" style="color:var(--green)">$0</div>
+          <div style="font-size:13px;color:var(--ink2);margin-top:2px">= <b class="tnum" id="o-cut-yr">$0</b> / year</div>
+        </div>
+        <div style="margin-top:16px">
+          <div class="mini"><span>New surplus / mo</span><b class="tnum" id="o-surplus"></b></div>
+        </div>
+        <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+          <div style="font-size:12px;text-transform:uppercase;letter-spacing:.07em;font-weight:600;color:var(--muted);margin-bottom:9px">Projected 50 / 30 / 20</div>
+          <div class="flowbar" id="o-503020" style="height:28px;margin:0 0 8px"></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--need)">Needs <b class="tnum" id="o-need-pct"></b></span>
+            <span style="color:var(--want)">Wants <b class="tnum" id="o-want-pct"></b></span>
+            <span style="color:var(--save)">Save <b class="tnum" id="o-save-pct"></b></span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px">Assumes everything not spent (your surplus + whatever you cut) is saved.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISC -->
+  <section class="panel" id="misc">
+    <div class="section-title"><span class="sec-num">03</span> Misc Breakdown</div>
+    <div class="card" style="margin-bottom:18px">
+      <h2>Spending Peaks — most spent at any point</h2>
+      <div class="cap">High-water marks for your spikiest categories (excluded categories omitted)</div>
+      <div class="peaks" id="peaks"></div>
+    </div>
+    <div class="card">
+      <h2>About the Misc Line</h2>
+      <div class="cap">~$700/mo of discretionary spend</div>
+      <div class="callout" style="margin-top:0">
+        This bucket is mostly <b>one-off retail</b>, not monthly bills — which is why it's tracked as a single line rather than broken into per-merchant monthly figures: clothing, home goods, kids' activities, events, and assorted P2P transfers. Spiky month to month.
+      </div>
+    </div>
+  </section>
+
+  <!-- 50/30/20 -->
+  <section class="panel" id="rule">
+    <div class="section-title"><span class="sec-num">04</span> 50 / 30 / 20</div>
+    <div class="card" style="margin-bottom:18px">
+      <h2>The 50 / 30 / 20 Rule</h2>
+      <div class="cap">Target: 50% needs · 30% wants · 20% savings — measured against <b class="tnum" id="r-base"></b>/mo <span id="r-basis" style="color:var(--muted)"></span>. The vertical mark on each bar is the target.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--ink)">
+          <input type="checkbox" id="rule-redirect"> Direct the monthly surplus into savings
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--ink)">
+          <input type="checkbox" id="rule-401k"> Include pre-tax 401(k) + match <span style="color:var(--muted);font-size:11px">(switches to gross-income basis)</span>
+        </label>
+      </div>
+    </div>
+    <div class="rule-grid" id="rulegrid"></div>
+    <div class="callout" id="rulenote"></div>
+  </section>
+
+  <!-- GROWTH -->
+  <section class="panel" id="growth">
+    <div class="section-title"><span class="sec-num">05</span> Growth</div>
+    <div class="card" style="margin-bottom:18px">
+      <h2>Projection Inputs</h2>
+      <div class="cap">Compound growth of your monthly savings. Drag to explore — everything updates live.</div>
+      <div class="ctrls">
+        <div class="ctrl">
+          <label>Monthly contribution <b id="g-contrib"></b></label>
+          <div class="presets">
+            <button class="pbtn" data-v="3175">Current $3,175</button>
+            <button class="pbtn" data-v="5620">+ Surplus $5,620</button>
+          </div>
+          <input type="range" id="g-pmt" min="0" max="9000" step="50" value="3175">
+        </div>
+        <div class="ctrl">
+          <label>Annual return <b id="g-rate-l"></b></label>
+          <input type="range" id="g-rate" min="0" max="12" step="0.5" value="7">
+          <div style="font-size:11px;color:var(--muted);margin-top:8px">7% ≈ long-run market average after inflation is lower (~5%)</div>
+        </div>
+        <div class="ctrl">
+          <label>Starting balance <b id="g-start-l"></b></label>
+          <input type="range" id="g-start" min="0" max="1200000" step="1000" value="150000">
+          <div style="font-size:11px;color:var(--muted);margin-top:8px">Pre-fill this from your investable accounts + cash savings</div>
+        </div>
+      </div>
+    </div>
+    <div class="milestones" id="milestones"></div>
+    <div class="card" style="margin-top:18px">
+      <h2>Growth Over Time</h2>
+      <div class="cap">Your contributions vs. compounding growth</div>
+      <div id="growthchart"></div>
+    </div>
+  </section>
+
+  <!-- NET WORTH -->
+  <section class="panel" id="networth">
+    <div class="section-title"><span class="sec-num">06</span> Net Worth</div>
+    <div class="grid2" style="margin-bottom:18px">
+      <div class="card">
+        <h2>Current Net Worth</h2>
+        <div class="cap">Assets minus liabilities · 529s excluded</div>
+        <div id="nwsummary"></div>
+      </div>
+      <div class="card">
+        <h2>Home Equity</h2>
+        <div class="cap">Market value minus mortgage balance</div>
+        <div id="nwequity"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:18px">
+      <h2>Project It Forward</h2>
+      <div class="cap">As you pay down the mortgages, homes appreciate, and investments grow</div>
+      <div class="ctrls">
+        <div class="ctrl"><label>Home appreciation /yr <b id="nw-app-l"></b></label>
+          <input type="range" id="nw-app" min="0" max="7" step="0.5" value="3.5"></div>
+        <div class="ctrl"><label>Investment return /yr <b id="nw-ret-l"></b></label>
+          <input type="range" id="nw-ret" min="0" max="12" step="0.5" value="7"></div>
+        <div class="ctrl"><label>Monthly investing <b id="nw-pmt-l"></b></label>
+          <input type="range" id="nw-pmt" min="0" max="9000" step="50" value="3175"></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:12px">Mortgage paydown uses estimated 30-yr P&amp;I (~$2,023 primary home, ~$590 rental); other debt held flat.</div>
+    </div>
+    <div class="milestones" id="nwmilestones"></div>
+    <div class="card" style="margin-top:18px">
+      <h2>Net Worth Over Time</h2>
+      <div class="cap">Investments + home equity, net of other debt</div>
+      <div id="nwchart"></div>
+    </div>
+  </section>
+
+  <!-- BUDGET -->
+  <section class="panel" id="budget">
+    <div class="section-title"><span class="sec-num">07</span> Budget</div>
+    <div class="bsum">
+      <div class="kpi"><div class="lab">Total Budget</div><div class="val tnum" id="b-total"></div><div class="note" id="b-incnote"></div></div>
+      <div class="kpi"><div class="lab">Spent · Month-to-date</div><div class="val tnum" id="b-spent"></div><div class="note">logged this month</div></div>
+      <div class="kpi"><div class="lab">Budget Used</div><div class="val tnum" id="b-used"></div><div class="note">of total budget</div></div>
+      <div class="kpi"><div class="lab">Test Month</div><div class="val tnum" id="b-month" style="font-size:19px"></div><div class="note" id="b-month-sub"></div></div>
+    </div>
+    <div id="b-review" style="display:none;background:var(--red-soft);border:1px solid var(--red);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--ink)"></div>
+    <div class="card">
+      <h2>Set Budgets &amp; Track</h2>
+      <div class="cap">Type a budget, or press <b style="color:var(--gold)">Tab</b> on an empty field to accept the faint suggestion. Saved in your browser. Meters fill as transactions are logged for the month.</div>
+      <div class="bgrouphdr">Fixed</div>
+      <div id="b-fixed"></div>
+      <div class="bgrouphdr">Variable</div>
+      <div id="b-variable"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;border-top:1px solid var(--line);padding-top:16px">
+        <button class="btn" id="b-export">⧉ Export budgets</button>
+        <button class="btn" id="b-import-t">⬇ Import / paste</button>
+      </div>
+      <div id="b-io-wrap" style="display:none">
+        <textarea class="bio" id="b-io" spellcheck="false"></textarea>
+        <div id="b-io-msg" style="font-size:11px;color:var(--muted);margin-top:6px"></div>
+        <button class="btn" id="b-apply" style="display:none">Apply pasted budgets</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    Built from parsed bank/card statements. Figures are monthly averages with outliers removed.<br>
+    Excluded categories (yours may differ): travel, medical, one-time purchases. For planning only.
+  </div>
+</div>
+
+<script>
+// ---------- LDGR splash: 5s pulsing loader on every load/refresh ----------
+setTimeout(()=>{const s=document.getElementById("splash");if(s){s.classList.add("hide");setTimeout(()=>s.remove(),750);}},5000);
+
+// ---------- DATA ----------
+const income = {
+  primary: 6200,        // your monthly take-home that reaches checking
+  partnerChecking: 5400, // partner take-home -> checking
+  partnerSavings: 800,  // partner paycheck auto-save (split off BEFORE checking)
+  rental: 600,          // net rental income (set to 0 if none)
+};
+const netIncome = income.primary + income.partnerChecking + income.rental; // auto-saved $800 excluded — it never reaches checking
+const intoChecking = income.primary + income.partnerChecking + income.rental;
+
+// After-tax "savings" that drives the Overview pie / 50-30-20 (cash flow view)
+const savings = {
+  autoSave: 800,   // partner's paycheck split to a savings account
+};
+
+// FULL savings & retirement picture (drives the Savings Rate KPI + hover) — measured vs GROSS
+const grossIncome = 120000 + 110000 + 600*12;   // both W-2 salaries + rental
+const savingsBreakdown = [
+  {n:"Partner 401(k) — contribution", mo:1250},
+  {n:"Employer match (free money)", mo:625, free:true},
+  {n:"Your 401(k)", mo:500},
+  {n:"Partner → savings (after-tax)", mo:800},
+];
+const fullSaveMo  = savingsBreakdown.reduce((s,x)=>s+x.mo,0);
+const fullSaveRate = Math.round(fullSaveMo*12/grossIncome*100);
+
+// 50/30/20 basis = total after-tax income (what reaches checking + the auto-save)
+const autoSave   = savings.autoSave;
+const preTaxSave = 1250 + 625 + 500;       // pre-tax: partner 401k + match + your 401k
+const ruleBase   = netIncome + autoSave;
+
+// bucket: 'need' | 'want'   (savings handled separately)
+const expenses = [
+  {name:"Mortgage / rent", amt:2400, bucket:"need", fixed:true},
+  {name:"Childcare", amt:1500, bucket:"need", fixed:true},
+  {name:"School tuition", amt:900, bucket:"need", fixed:true},
+  {name:"Groceries", amt:850, bucket:"need"},
+  {name:"Misc / discretionary", amt:700, bucket:"want"},
+  {name:"Restaurants / dining", amt:450, bucket:"want"},
+  {name:"Car payment", amt:420, bucket:"need", fixed:true},
+  {name:"Amazon", amt:300, bucket:"want"},
+  {name:"Financial advisor", amt:250, bucket:"want", fixed:true},
+  {name:"Electric", amt:220, bucket:"need"},
+  {name:"Target", amt:200, bucket:"want"},
+  {name:"Church / giving", amt:200, bucket:"want"},
+  {name:"Insurance (life/pet/home)", amt:180, bucket:"need", fixed:true},
+  {name:"Housekeeping", amt:160, bucket:"want"},
+  {name:"Student loan", amt:150, bucket:"need", fixed:true},
+  {name:"Phone", amt:140, bucket:"need"},
+  {name:"Kids' activities", amt:120, bucket:"want"},
+  {name:"Auto insurance", amt:120, bucket:"need", fixed:true},
+  {name:"Pet care", amt:110, bucket:"want"},
+  {name:"Water / trash", amt:100, bucket:"need"},
+  {name:"Subscriptions", amt:95, bucket:"want"},
+  {name:"Internet", amt:90, bucket:"need", fixed:true},
+  {name:"Lawn care", amt:60, bucket:"want"},
+  {name:"Tolls", amt:40, bucket:"need"},
+];
+
+// Peaks ("most spent at any point") — sample data; regenerate from your statements
+const peaks = [
+  {cat:"Target", single:"$412", slab:"biggest month (Apr)", month:null, c:"var(--want)",
+   detail:"Monthly card payment — Apr 2026"},
+  {cat:"Amazon", single:"$260", slab:"biggest single order (Mar)", month:"$980 in March", c:"var(--want)",
+   detail:"March had several one-off large orders"},
+  {cat:"Dining", single:"$95", slab:"biggest single tab", month:"$520 in February", c:"var(--want)",
+   detail:"Anniversary dinner — Feb 2026"},
+];
+
+const fmt = n => "$"+Math.round(n).toLocaleString();
+const sum = a => a.reduce((s,x)=>s+x,0);
+const totalExp = sum(expenses.map(e=>e.amt));
+const totalNeed = sum(expenses.filter(e=>e.bucket==="need").map(e=>e.amt));
+const totalWant = sum(expenses.filter(e=>e.bucket==="want").map(e=>e.amt));
+const totalSave = savings.autoSave;
+
+// ---------- KPIs ----------
+document.getElementById("asof").textContent = "Net income basis: "+fmt(netIncome)+"/mo";
+document.getElementById("k-income").textContent = fmt(netIncome);
+document.getElementById("k-exp").textContent = fmt(totalExp);
+document.getElementById("k-exp-n").textContent = expenses.length+" categories";
+const surplus = intoChecking - totalExp;
+document.getElementById("k-surplus").textContent = fmt(surplus);
+document.getElementById("k-rate").textContent = fullSaveRate+"%";
+// hover breakdown
+const withSurplusRate = Math.round((fullSaveMo+ (intoChecking-totalExp))*12/grossIncome*100);
+document.getElementById("savetip").innerHTML =
+  `<h4>Savings &amp; Retirement / mo</h4>`+
+  savingsBreakdown.map(x=>`<div class="tr ${x.free?'free':''}"><span>${x.n}</span><b>${fmt(x.mo)}</b></div>`).join("")+
+  `<div class="tr tot"><span>Total saved</span><b>${fmt(fullSaveMo)}</b></div>`+
+  `<div class="tipfoot">${fmt(fullSaveMo*12)}/yr · <b>${fullSaveRate}%</b> of ${fmt(grossIncome)} gross.<br>`+
+  `Redirect the ~${fmt(intoChecking-totalExp)}/mo surplus too → <b>${withSurplusRate}%</b>.</div>`;
+
+// ---------- OVERVIEW: flow bar ----------
+const unalloc = Math.max(0, netIncome - totalNeed - totalWant);  // = surplus (savings already removed upstream)
+const flowParts = [
+  {v:totalNeed, c:"var(--need)"},{v:totalWant,c:"var(--want)"},
+  {v:unalloc,c:"#5a6480"}
+];
+document.getElementById("flow").innerHTML = flowParts.map(p=>
+  `<div style="flex:${p.v};background:${p.c}">${p.v/netIncome>0.07?fmt(p.v):""}</div>`).join("");
+document.getElementById("f-need").textContent=fmt(totalNeed);
+document.getElementById("f-want").textContent=fmt(totalWant);
+document.getElementById("f-surp").textContent=fmt(unalloc);
+
+// ---------- OVERVIEW: bars ----------
+const maxAmt = Math.max(...expenses.map(e=>e.amt));
+document.getElementById("bars").innerHTML = [...expenses].sort((a,b)=>b.amt-a.amt).map(e=>`
+  <div class="row">
+    <div class="nm" title="${e.name}">${e.name}</div>
+    <div class="track"><div class="fill ${e.bucket}" style="width:${e.amt/maxAmt*100}%"></div></div>
+    <div class="amt tnum">${fmt(e.amt)}</div>
+  </div>`).join("");
+
+// ---------- OVERVIEW: donut ----------
+const segs=[{lab:"Needs",v:totalNeed,c:"var(--need)"},{lab:"Wants",v:totalWant,c:"var(--want)"},
+            {lab:"Surplus",v:unalloc,c:"#5a6480"}];
+let acc=0; const stops=segs.map(s=>{const a=acc/netIncome*360,b=(acc+s.v)/netIncome*360;acc+=s.v;return `${s.c} ${a}deg ${b}deg`});
+document.getElementById("donut").style.background=`conic-gradient(${stops.join(",")})`;
+document.getElementById("d-ctr").textContent=Math.round(totalExp/netIncome*100)+"%";
+document.getElementById("legend").innerHTML=segs.map(s=>`
+  <div class="li"><span class="dot" style="background:${s.c}"></span>${s.lab}
+  <span class="v tnum">${fmt(s.v)} · ${Math.round(s.v/netIncome*100)}%</span></div>`).join("");
+
+// ---------- OPTIMIZER ----------
+let state = expenses.map(e=>({...e, cur:e.amt}));
+const optlist=document.getElementById("optlist");
+function renderOpt(){
+  optlist.innerHTML = state.map((e,i)=>`
+    <div class="opt-row ${e.cur===0?'off':''}">
+      <input type="checkbox" ${e.cur>0?'checked':''} data-i="${i}" class="ck">
+      <div class="onm">${e.name}<span class="tag ${e.bucket}">${e.bucket}</span></div>
+      <div class="slidecell"><input type="range" min="0" max="${e.amt}" value="${e.cur}" step="1" data-i="${i}" class="sl"></div>
+      <div class="ov ${e.cur<e.amt?'cut':''} tnum">${fmt(e.cur)}</div>
+    </div>`).join("");
+  optlist.querySelectorAll(".sl").forEach(s=>s.oninput=e=>{state[+e.target.dataset.i].cur=+e.target.value;renderOpt();calcOpt();});
+  optlist.querySelectorAll(".ck").forEach(c=>c.onchange=e=>{const i=+e.target.dataset.i;state[i].cur=e.target.checked?state[i].amt:0;renderOpt();calcOpt();});
+}
+function calcOpt(){
+  const newExp=sum(state.map(e=>e.cur));
+  const cut=totalExp-newExp;
+  document.getElementById("o-exp").textContent=fmt(newExp);
+  document.getElementById("o-cut").textContent=fmt(cut);
+  document.getElementById("o-cut-yr").textContent=fmt(cut*12);
+  document.getElementById("o-deltabox").className="deltabox"+(cut<=0?" zero":"");
+  const newSurplus=intoChecking-newExp;
+  document.getElementById("o-surplus").textContent=fmt(newSurplus);
+  // live 50/30/20 (cuts assumed saved): savings = ruleBase - needs - wants
+  const newNeed=sum(state.filter(e=>e.bucket==="need").map(e=>e.cur));
+  const newWant=sum(state.filter(e=>e.bucket==="want").map(e=>e.cur));
+  const newSaveAmt=Math.max(0,ruleBase-newNeed-newWant);
+  document.getElementById("o-need-pct").textContent=Math.round(newNeed/ruleBase*100)+"%";
+  document.getElementById("o-want-pct").textContent=Math.round(newWant/ruleBase*100)+"%";
+  document.getElementById("o-save-pct").textContent=Math.round(newSaveAmt/ruleBase*100)+"%";
+  document.getElementById("o-503020").innerHTML=
+    `<div style="flex:${newNeed};background:var(--need)"></div>`+
+    `<div style="flex:${newWant};background:var(--want)"></div>`+
+    `<div style="flex:${newSaveAmt};background:var(--save)"></div>`;
+}
+document.getElementById("reset").onclick=()=>{state=expenses.map(e=>({...e,cur:e.amt}));renderOpt();calcOpt();};
+renderOpt();calcOpt();
+
+// ---------- 50/30/20 ----------
+const redirectEl=document.getElementById("rule-redirect");
+const incl401kEl=document.getElementById("rule-401k");
+const grossMo=grossIncome/12;
+function renderRule(){
+  const redirect=redirectEl.checked, incl=incl401kEl.checked;
+  const base = incl ? grossMo : ruleBase;
+  const saveAmt = autoSave + (incl?preTaxSave:0) + (redirect?surplus:0);
+  document.getElementById("r-base").textContent=fmt(base);
+  document.getElementById("r-basis").textContent = incl ? "· gross income (incl. pre-tax 401k)" : "· after-tax (checking + auto-save)";
+  const buckets=[
+    {key:"need",lab:"Needs",pct:50,actual:totalNeed,c:"var(--need)",
+     ex:"Mortgage, childcare, tuition, groceries, utilities, car payment, insurance"},
+    {key:"want",lab:"Wants",pct:30,actual:totalWant,c:"var(--want)",
+     ex:"Dining, Amazon/Target, housekeeping, subscriptions, giving, advisor"},
+    {key:"save",lab:"Savings",pct:20,actual:saveAmt,c:"var(--save)",bd:true},
+  ];
+  document.getElementById("rulegrid").innerHTML=buckets.map(b=>{
+    const actPct=b.actual/base*100, target=b.pct, diff=actPct-target;
+    let verdict,vc;
+    if(b.key==="save"){
+      if(actPct>=target){verdict="On target ✓";vc="v-good";}
+      else{verdict=`${Math.round(target-actPct)}% below target`;vc="v-under";}
+    } else if(incl){
+      verdict="reference only";vc="v-under";   // 50/30 marks are after-tax benchmarks
+    } else {
+      if(Math.abs(diff)<=3){verdict="On target ✓";vc="v-good";}
+      else if(diff>0){verdict=`${Math.round(diff)}% over target`;vc="v-over";}
+      else{verdict=`${Math.round(-diff)}% under target`;vc="v-under";}
+    }
+    let extra="";
+    if(b.bd){
+      extra=`<div class="savebd">`+
+        `<div class="sbd"><span>Auto-save (after-tax)</span><b>${fmt(autoSave)}</b></div>`+
+        (incl
+          ? `<div class="sbd"><span>Partner + your 401(k)</span><b>${fmt(1250+500)}</b></div>`+
+            `<div class="sbd"><span>Employer match (free)</span><b style="color:var(--green)">${fmt(625)}</b></div>`
+          : ``)+
+        (redirect
+          ? `<div class="sbd"><span>Surplus redirected</span><b style="color:var(--green)">+${fmt(surplus)}</b></div>`
+          : `<div class="sbd dim"><span>Surplus (not yet saved)</span><b>${fmt(surplus)}</b></div>`)+
+        `<div class="sbd note">`+(incl
+            ? `Gross basis — 401(k) + match now counted. The 50/30 needs/wants marks are after-tax benchmarks, so treat them as reference here.`
+            : `＋ pre-tax 401(k) + match: ${fmt(preTaxSave)}/mo not counted in this after-tax view (tick "Include pre-tax 401(k)").`)+
+        `</div>`+
+      `</div>`;
+    }
+    return `<div class="rule-card">
+      <div class="rh"><span class="dot" style="background:${b.c}"></span>${b.lab}</div>
+      <div class="pct-target">Target ${b.pct}% · ${fmt(base*b.pct/100)}/mo</div>
+      <div class="gauge"><div class="g" style="width:${Math.min(actPct,100)}%;background:${b.c}"></div>
+        <div class="target-mark" style="left:${target}%"></div></div>
+      <div class="actual tnum">${fmt(Math.round(b.actual))} <span style="font-size:14px;color:var(--muted)">· ${Math.round(actPct)}%</span></div>
+      <div class="vs" style="color:var(--ink2)">${b.ex||''}</div>
+      <div class="verdict ${vc}">${verdict}</div>${extra}
+    </div>`;
+  }).join("");
+  const sPct=Math.round(saveAmt/base*100);
+  document.getElementById("rulenote").innerHTML=
+    `<b>Read this:</b> Measured on <b>${fmt(base)}/mo</b> ${incl?"<b>gross</b> income":"after-tax income"}. `+
+    (incl
+      ? `Savings now counts your pre-tax 401(k) + match, landing at <b>${sPct}%</b>${redirect?" with the surplus swept in":""} — matching your true <b>${fullSaveRate}% of gross</b> headline. On gross, needs/wants read lower (${Math.round(totalNeed/base*100)}% / ${Math.round(totalWant/base*100)}%); the 50/30 marks are after-tax benchmarks, so they're references here.`
+      : `Needs ~${Math.round(totalNeed/base*100)}% (a touch high), wants a lean ~${Math.round(totalWant/base*100)}%. After-tax savings shows <b>${sPct}%</b>. Tick "Direct surplus" to sweep in the ${fmt(surplus)} surplus, or "Include pre-tax 401(k)" to count your full retirement saving (~${fullSaveRate}% of gross).`);
+}
+redirectEl.onchange=renderRule;
+incl401kEl.onchange=renderRule;
+renderRule();
+
+// ---------- MISC TAB ----------
+document.getElementById("peaks").innerHTML = peaks.map(p=>`
+  <div class="peak">
+    <div class="pcat">${p.cat}</div>
+    <div class="pbig tnum">${p.single}</div>
+    <div class="pslab">${p.slab}</div>
+    ${p.month?`<div class="pmonth tnum">▲ ${p.month}</div>`:`<div class="pmonth tnum">▲ ${p.detail}</div>`}
+    ${p.month?`<div class="pdet">${p.detail}</div>`:``}
+  </div>`).join("");
+
+// ---------- GROWTH PROJECTION ----------
+const pmtEl=document.getElementById("g-pmt"),rateEl=document.getElementById("g-rate"),startEl=document.getElementById("g-start");
+function fv(pmt,annual,years,start){
+  const r=annual/100/12,n=years*12;
+  const c = r===0 ? pmt*n : pmt*((Math.pow(1+r,n)-1)/r);
+  const s = start*Math.pow(1+r,n);
+  return {total:c+s, contributed:pmt*n+start};
+}
+const fmtK=n=> n>=1e6 ? "$"+(n/1e6).toFixed(2)+"M" : n>=1e3 ? "$"+Math.round(n/1e3)+"k" : "$"+Math.round(n);
+function renderGrowth(){
+  const pmt=+pmtEl.value,rate=+rateEl.value,start=+startEl.value;
+  document.getElementById("g-contrib").textContent=fmt(pmt)+"/mo";
+  document.getElementById("g-rate-l").textContent=rate+"%";
+  document.getElementById("g-start-l").textContent=fmt(start);
+  document.querySelectorAll(".pbtn").forEach(b=>b.classList.toggle("active",+b.dataset.v===pmt));
+  // milestone cards
+  document.getElementById("milestones").innerHTML=[5,10,20,30].map(y=>{
+    const f=fv(pmt,rate,y,start),g=f.total-f.contributed;
+    return `<div class="ms"><div class="yr">${y} years</div>
+      <div class="tot tnum">${fmt(Math.round(f.total))}</div>
+      <div class="br"><span>Contributed</span><b>${fmt(Math.round(f.contributed))}</b></div>
+      <div class="br grow"><span>Growth</span><b>+${fmt(Math.round(g))}</b></div></div>`;
+  }).join("");
+  // chart
+  const cy=[5,10,15,20,25,30],H=230;
+  const data=cy.map(y=>{const f=fv(pmt,rate,y,start);return{y,total:f.total,contributed:f.contributed};});
+  const max=Math.max(...data.map(d=>d.total))||1;
+  document.getElementById("growthchart").innerHTML=
+    `<div class="gchart">`+data.map(d=>{
+      const cH=d.contributed/max*H,gH=(d.total-d.contributed)/max*H;
+      return `<div class="gcol"><div class="gval">${fmtK(d.total)}</div>
+        <div class="gseg-g" style="height:${gH}px"></div>
+        <div class="gseg-c" style="height:${cH}px"></div>
+        <div class="glab">${d.y}y</div></div>`;}).join("")+`</div>`+
+    `<div style="display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--ink2)">
+       <span><span class="dot" style="background:var(--save);display:inline-block;vertical-align:middle"></span> Contributed</span>
+       <span><span class="dot" style="background:var(--green);display:inline-block;vertical-align:middle"></span> Growth</span></div>`;
+}
+[pmtEl,rateEl,startEl].forEach(el=>el.oninput=renderGrowth);
+document.querySelectorAll(".pbtn").forEach(b=>b.onclick=()=>{pmtEl.value=b.dataset.v;renderGrowth();});
+renderGrowth();
+
+// ---------- NET WORTH ----------
+const NW={
+  investStart: 150000,   // investable accounts + cash savings (exclude 529s if you prefer)
+  homes:[
+    {name:"Primary Home", value:450000, loan:320000, rate:6.50, pmt:2023},
+    {name:"Rental Condo", value:250000, loan:140000, rate:3.00, pmt:590},
+  ],
+  otherDebt: 4000 + 8000,   // credit cards + other loans
+};
+function amort(bal,annual,pmt,months){let b=bal,r=annual/100/12;for(let i=0;i<months&&b>0;i++){b+=b*r-pmt;}return Math.max(0,b);}
+function projNW(years,app,ret,pmt){
+  const inv=fv(pmt,ret,years,NW.investStart).total;
+  let eq=0; NW.homes.forEach(h=>{eq+=h.value*Math.pow(1+app/100,years)-amort(h.loan,h.rate,h.pmt,years*12);});
+  return {nw:inv+eq-NW.otherDebt, inv, eq};
+}
+const reTotal=NW.homes.reduce((s,h)=>s+h.value,0), mortTotal=NW.homes.reduce((s,h)=>s+h.loan,0);
+const assetsNow=NW.investStart+reTotal, liabNow=mortTotal+NW.otherDebt, nwNow=assetsNow-liabNow;
+document.getElementById("nwsummary").innerHTML=
+  `<div class="nwline"><span>Investments + cash</span><b>${fmt(NW.investStart)}</b></div>`+
+  `<div class="nwline"><span>Real estate</span><b>${fmt(reTotal)}</b></div>`+
+  `<div class="nwline tot"><span>Total assets</span><b>${fmt(assetsNow)}</b></div>`+
+  `<div class="nwline neg"><span>Mortgages</span><b>−${fmt(mortTotal)}</b></div>`+
+  `<div class="nwline neg"><span>Credit cards + other loans</span><b>−${fmt(NW.otherDebt)}</b></div>`+
+  `<div class="nwline tot"><span>Total liabilities</span><b>−${fmt(liabNow)}</b></div>`+
+  `<div class="nwline grand"><span>NET WORTH</span><b>${fmt(nwNow)}</b></div>`;
+document.getElementById("nwequity").innerHTML=
+  NW.homes.map(h=>`<div class="nwline"><span>${h.name}<br><span style="font-size:10px;color:var(--muted)">${fmt(h.value)} − ${fmt(h.loan)} @ ${h.rate}%</span></span><b>${fmt(h.value-h.loan)}</b></div>`).join("")+
+  `<div class="nwline grand"><span>Total home equity</span><b>${fmt(reTotal-mortTotal)}</b></div>`;
+
+const nwApp=document.getElementById("nw-app"),nwRet=document.getElementById("nw-ret"),nwPmt=document.getElementById("nw-pmt");
+function renderNW(){
+  const app=+nwApp.value,ret=+nwRet.value,pmt=+nwPmt.value;
+  document.getElementById("nw-app-l").textContent=app+"%";
+  document.getElementById("nw-ret-l").textContent=ret+"%";
+  document.getElementById("nw-pmt-l").textContent=fmt(pmt)+"/mo";
+  document.getElementById("nwmilestones").innerHTML=[5,10,20,30].map(y=>{
+    const p=projNW(y,app,ret,pmt);
+    return `<div class="ms"><div class="yr">${y} years</div><div class="tot tnum">${fmt(Math.round(p.nw))}</div>
+      <div class="br"><span>Investments</span><b>${fmt(Math.round(p.inv))}</b></div>
+      <div class="br grow"><span>Home equity</span><b>${fmt(Math.round(p.eq))}</b></div></div>`;}).join("");
+  const cy=[0,5,10,15,20,25,30],H=230;
+  const data=cy.map(y=>{const p=projNW(y,app,ret,pmt);return{y,nw:p.nw,inv:p.inv,eq:p.eq};});
+  const max=Math.max(...data.map(d=>d.nw))||1;
+  document.getElementById("nwchart").innerHTML=
+    `<div class="gchart">`+data.map(d=>{
+      const eqNet=Math.max(0,d.eq-NW.otherDebt);
+      const iH=d.inv/max*H,eH=eqNet/max*H;
+      return `<div class="gcol"><div class="gval">${fmtK(d.nw)}</div>
+        <div style="width:100%;height:${eH}px;background:var(--need);border-radius:4px 4px 0 0"></div>
+        <div style="width:100%;height:${iH}px;background:var(--save)"></div>
+        <div class="glab">${d.y===0?'now':d.y+'y'}</div></div>`;}).join("")+`</div>`+
+    `<div style="display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--ink2)">
+       <span><span class="dot" style="background:var(--save);display:inline-block;vertical-align:middle"></span> Investments + cash</span>
+       <span><span class="dot" style="background:var(--need);display:inline-block;vertical-align:middle"></span> Home equity</span></div>`;
+}
+[nwApp,nwRet,nwPmt].forEach(el=>el.oninput=renderNW);
+renderNW();
+
+// ---------- BUDGET ----------
+/* BUDGET_ACTUALS_START — the daily email-alert skill rewrites this block (month + per-category MTD spend) */
+const actualsMonth = "2026-07";
+const actuals = {
+  "Mortgage / rent":0.0,
+  "Childcare":0.0,
+  "School tuition":0.0,
+  "Car payment":0.0,
+  "Internet":0.0,
+  "Student loan":0.0,
+  "Insurance (life/pet/home)":0.0,
+  "Auto insurance":0.0,
+  "Phone":0.0,
+  "Financial advisor":0.0,
+  "Groceries":0.0,
+  "Electric":0.0,
+  "Water / trash":0.0,
+  "Restaurants":0.0,
+  "Amazon":0.0,
+  "Target":0.0,
+  "Misc / discretionary":0.0,
+  "Church / giving":0.0,
+  "Housekeeping":0.0,
+  "Pet care":0.0,
+  "Lawn care":0.0,
+  "Subscriptions":0.0,
+  "Kids' activities":0.0,
+  "Tolls":0.0
+};
+/* BUDGET_ACTUALS_END */
+
+/* BUDGET_GOALS_START — the skill bakes your saved budgets here (from the budget_goals table) so they survive a fresh file/browser */
+const savedBudgets = {
+  "Mortgage / rent":2400.0,
+  "Childcare":1500.0,
+  "School tuition":900.0,
+  "Car payment":420.0,
+  "Internet":90.0,
+  "Student loan":150.0,
+  "Insurance (life/pet/home)":180.0,
+  "Auto insurance":120.0,
+  "Phone":140.0,
+  "Financial advisor":250.0,
+  "Groceries":850.0,
+  "Electric":220.0,
+  "Water / trash":100.0,
+  "Restaurants":450.0,
+  "Amazon":300.0,
+  "Target":200.0,
+  "Misc / discretionary":700.0,
+  "Church / giving":200.0,
+  "Housekeeping":160.0,
+  "Pet care":110.0,
+  "Lawn care":60.0,
+  "Subscriptions":95.0,
+  "Kids' activities":120.0,
+  "Tolls":40.0
+};
+/* BUDGET_GOALS_END */
+
+/* BUDGET_REVIEW_START — skill sets the needs-review banner */
+const needsReview = {count:0, amount:0.0};
+/* BUDGET_REVIEW_END */
+
+const budgetCats=[
+  {n:"Mortgage / rent",d:2400,fx:1},{n:"Childcare",d:1500,fx:1},{n:"School tuition",d:900,fx:1},
+  {n:"Car payment",d:420,fx:1},{n:"Internet",d:90,fx:1},{n:"Student loan",d:150,fx:1},
+  {n:"Insurance (life/pet/home)",d:180,fx:1},{n:"Auto insurance",d:120,fx:1},{n:"Phone",d:140},
+  {n:"Financial advisor",d:250,fx:1},{n:"Groceries",d:850},{n:"Electric",d:220},
+  {n:"Water / trash",d:100},{n:"Restaurants",d:450},{n:"Amazon",d:300},{n:"Target",d:200},
+  {n:"Misc / discretionary",d:700},{n:"Church / giving",d:200},{n:"Housekeeping",d:160},
+  {n:"Pet care",d:110},{n:"Lawn care",d:60},{n:"Subscriptions",d:95},{n:"Kids' activities",d:120},
+  {n:"Tolls",d:40}
+];
+const BKEY="finbudget.v1.";
+const savedVal=n=>{const v=localStorage.getItem(BKEY+n);return (v!==null&&v!=="")?v:null;};
+// resolution: this browser's edit  →  DB-baked saved budget  →  hardcoded default suggestion
+const budgetOf=c=>{const v=savedVal(c.n);if(v!==null)return +v;if(savedBudgets[c.n]!=null)return +savedBudgets[c.n];return c.d;};
+const inputVal=c=>{const v=savedVal(c.n);if(v!==null)return v;if(savedBudgets[c.n]!=null)return String(savedBudgets[c.n]);return "";};
+function monthCtx(){
+  const [y,m]=actualsMonth.split("-").map(Number);
+  const dim=new Date(y,m,0).getDate(), now=new Date();
+  const start=new Date(y,m-1,1), end=new Date(y,m,1);
+  const elapsed = now<start?0 : now>=end?dim : now.getDate();
+  return {label:start.toLocaleString('en-US',{month:'long',year:'numeric'}),elapsed,dim};
+}
+function meterState(spent,bud){const pct=bud>0?spent/bud*100:0;return {pct,state:pct>100?"bm-over":pct>=80?"bm-warn":"bm-under"};}
+function amtHTML(spent,bud){const {pct}=meterState(spent,bud);return `${fmt(spent)} / ${fmt(bud)} <span class="${pct>100?'over':''}">· ${Math.round(pct)}%${pct>100?' OVER':''}</span>`;}
+function rowHTML(c){
+  const bud=budgetOf(c), spent=actuals[c.n]||0, {pct,state}=meterState(spent,bud), v=inputVal(c);
+  return `<div class="brow" data-cat="${c.n}">
+    <div class="bname" title="${c.n}">${c.n}</div>
+    <div class="bicell"><span class="cur">$</span><input class="binput" type="number" inputmode="numeric" min="0" data-cat="${c.n}" data-def="${c.d}" placeholder="${c.d}" value="${v}"></div>
+    <div class="bm-track"><div class="bm-fill ${state}" style="width:${Math.min(100,pct)}%"></div></div>
+    <div class="bm-amt">${amtHTML(spent,bud)}</div>
+  </div>`;
+}
+function renderRowMeter(row){
+  const c=budgetCats.find(x=>x.n===row.dataset.cat), bud=budgetOf(c), spent=actuals[c.n]||0, {pct,state}=meterState(spent,bud);
+  const fill=row.querySelector(".bm-fill");
+  fill.style.width=Math.min(100,pct)+"%"; fill.className="bm-fill "+state;
+  row.querySelector(".bm-amt").innerHTML=amtHTML(spent,bud);
+}
+function updateBudgetSummary(){
+  let totBud=0,totSpent=0;
+  budgetCats.forEach(c=>{totBud+=budgetOf(c);totSpent+=actuals[c.n]||0;});
+  const mc=monthCtx();
+  document.getElementById("b-total").textContent=fmt(totBud);
+  document.getElementById("b-spent").textContent=fmt(totSpent);
+  document.getElementById("b-used").textContent=(totBud?Math.round(totSpent/totBud*100):0)+"%";
+  document.getElementById("b-month").textContent=mc.label;
+  document.getElementById("b-month-sub").textContent= mc.elapsed===0?"awaiting first transactions":`day ${mc.elapsed} of ${mc.dim}`;
+  const diff=intoChecking-totBud, n=document.getElementById("b-incnote");
+  n.textContent = diff>=0?`${fmt(diff)}/mo under net income`:`${fmt(-diff)}/mo OVER net income`;
+  n.style.color = diff>=0?"var(--muted)":"var(--red)";
+  const rv=document.getElementById("b-review");
+  if(typeof needsReview!=="undefined" && needsReview.count>0){
+    rv.style.display="block";
+    rv.innerHTML=`<b style="color:var(--red)">⚠ ${needsReview.count} transaction${needsReview.count>1?'s':''} need a category</b> (${fmt(needsReview.amount)} unassigned). Run <b>/budget-sync resolve</b> to categorize them.`;
+  } else { rv.style.display="none"; }
+}
+function renderBudget(){
+  document.getElementById("b-fixed").innerHTML=budgetCats.filter(c=>c.fx).map(rowHTML).join("");
+  document.getElementById("b-variable").innerHTML=budgetCats.filter(c=>!c.fx).map(rowHTML).join("");
+  document.querySelectorAll("#budget .binput").forEach(inp=>{
+    inp.addEventListener("input",()=>{
+      const k=BKEY+inp.dataset.cat;
+      if(inp.value==="") localStorage.removeItem(k); else localStorage.setItem(k,inp.value);
+      renderRowMeter(inp.closest(".brow")); updateBudgetSummary();
+    });
+    inp.addEventListener("keydown",e=>{
+      if(e.key==="Tab" && !e.shiftKey && inp.value===""){           // accept the faint suggestion
+        inp.value=inp.dataset.def;
+        localStorage.setItem(BKEY+inp.dataset.cat,inp.dataset.def);
+        renderRowMeter(inp.closest(".brow")); updateBudgetSummary();
+      }
+    });
+  });
+  updateBudgetSummary();
+}
+renderBudget();
+
+// ---- budget export / import ----
+function currentBudgets(){const o={};budgetCats.forEach(c=>o[c.n]=budgetOf(c));return o;}
+const ioWrap=document.getElementById("b-io-wrap"), ioBox=document.getElementById("b-io"),
+      ioMsg=document.getElementById("b-io-msg"), applyBtn=document.getElementById("b-apply");
+document.getElementById("b-export").onclick=()=>{
+  const o=currentBudgets(), total=Object.values(o).reduce((s,v)=>s+v,0);
+  ioWrap.style.display="block"; applyBtn.style.display="none";
+  ioBox.value=JSON.stringify(o,null,2);
+  ioBox.readOnly=true; ioBox.focus(); ioBox.select();
+  ioMsg.textContent=`Total ${fmt(total)} across ${budgetCats.length} categories — copied to clipboard if allowed; otherwise select-all & copy.`;
+  try{navigator.clipboard&&navigator.clipboard.writeText(ioBox.value);}catch(e){}
+};
+document.getElementById("b-import-t").onclick=()=>{
+  ioWrap.style.display="block"; ioBox.readOnly=false; ioBox.value=""; applyBtn.style.display="inline-block";
+  ioMsg.textContent='Paste a budgets JSON, then Apply. (Keys must match category names.)';
+  ioBox.focus();
+};
+applyBtn.onclick=()=>{
+  let o; try{o=JSON.parse(ioBox.value);}catch(e){ioMsg.textContent="⚠ Not valid JSON.";return;}
+  let n=0; budgetCats.forEach(c=>{if(o[c.n]!=null&&o[c.n]!==""){localStorage.setItem(BKEY+c.n,String(+o[c.n]));n++;}});
+  renderBudget(); ioWrap.style.display="none";
+  ioMsg.textContent=`Applied ${n} budgets.`;
+};
+
+// ---------- tabs ----------
+const tabs=[...document.querySelectorAll(".tab")];
+tabs.forEach(t=>t.onclick=()=>{
+  tabs.forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById(t.dataset.t).classList.add("active");
+});
+
+// ---------- count-up KPIs ----------
+function countUp(id,target,suffix){
+  const el=document.getElementById(id); if(!el) return;
+  const dur=900, t0=performance.now();
+  function step(now){
+    const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3); // easeOutCubic
+    el.textContent = suffix==="%" ? Math.round(target*e)+"%" : fmt(target*e);
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+countUp("k-income",netIncome);
+countUp("k-exp",totalExp);
+countUp("k-surplus",surplus);
+countUp("k-rate",fullSaveRate,"%");
+</script>
+</body>
+</html>

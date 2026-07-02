@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Friday 9 AM weekly Budget Brief (macOS launchd). Replace REPLACE_WITH_HOME with your
+     home directory, copy to ~/Library/LaunchAgents/, then:
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ldgr.weekly-report.plist -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.ldgr.weekly-report</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>REPLACE_WITH_HOME/.claude/skills/weekly-budget-report/run_weekly_report.sh</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key><integer>5</integer>
+    <key>Hour</key><integer>9</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key><string>REPLACE_WITH_HOME/.claude/skills/weekly-budget-report/launchd.out.log</string>
+  <key>StandardErrorPath</key><string>REPLACE_WITH_HOME/.claude/skills/weekly-budget-report/launchd.err.log</string>
+</dict>
+</plist>
