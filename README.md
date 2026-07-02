@@ -92,6 +92,10 @@ automation/                   launchd templates for the schedules
 The dashboard in this repo is populated with a **fictional sample household**
 so you can open it in a browser right now and click around.
 
+The two skills ship in the repo but *run* from `~/.claude/skills/` — the agent
+copies them there during setup (Phase 5 of CLAUDE.md), personalizes the category
+map and runner config, and wires up the schedulers. Nothing to install separately.
+
 ## Security & privacy notes
 
 - Nothing in this repo phones home. The only outbound calls are the ones you
