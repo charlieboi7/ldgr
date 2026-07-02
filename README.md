@@ -26,6 +26,34 @@ your database and one HTML file on your machine.
 - **weekly-budget-report skill** — Friday email with pacing, watch list, top
   categories, and every meter. Pure Python; no LLM in the loop.
 
+## What you'll need
+
+- **A Claude subscription + [Claude Code](https://claude.com/claude-code)** — the
+  agent does the setup and the daily sync. Connect its Gmail integration.
+- **A Gmail account** — it receives your banks' transaction alerts (the data
+  feed) and is what Claude Code connects to. A dedicated Gmail just for alerts
+  works fine.
+- **Mac or Linux.** The scheduler templates are macOS launchd; Linux uses cron.
+  (Windows: WSL, with some improvisation.)
+- **Python 3** — the only dependency is `psycopg2-binary` (installed during setup).
+- **A Postgres database** — [Ghost](https://ghost.build) provisions one from the
+  CLI in seconds (free tier), or use Neon/Supabase/local. See
+  [docs/setup-database.md](docs/setup-database.md).
+- **5–6 months of PDF statements** from every account money moves through —
+  checking plus each credit card. ~20 minutes of downloading from bank portals;
+  this is the most manual step.
+- **Per-transaction email alerts enabled** at each bank/card (threshold $0–$1),
+  pointed at that Gmail — without them the daily sync has nothing to read.
+- For the Friday email: a **Gmail app password** (requires 2-Step Verification —
+  five-minute detour, see [the skill's SETUP.md](skills/weekly-budget-report/SETUP.md)).
+
+No coding required — budget an afternoon, mostly spent answering the agent's
+questions and sanity-checking its numbers. One trust decision to make up front:
+the unattended daily sync runs headless Claude with permissions skipped
+([docs/automation.md](docs/automation.md) explains the trade-off); the cautious
+alternative is running `/budget-sync` yourself each morning, which works
+identically.
+
 ## Quick start (the intended way)
 
 1. Install [Claude Code](https://claude.com/claude-code) and connect its Gmail
