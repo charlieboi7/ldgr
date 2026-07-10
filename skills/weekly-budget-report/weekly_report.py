@@ -33,7 +33,7 @@ DEFAULTS = {
   "Student loan":150,"Insurance (life/pet/home)":180,"Auto insurance":120,"Phone":140,
   "Financial advisor":250,"Groceries":850,"Electric":220,"Water / trash":100,"Restaurants":450,
   "Amazon":300,"Target":200,"Misc / discretionary":700,"Church / giving":200,"Housekeeping":160,
-  "Pet care":110,"Lawn care":60,"Subscriptions":95,"Kids' activities":120,"Tolls":40,
+  "Pet care":110,"Lawn care":75,"Subscriptions":95,"Kids' activities":120,"Tolls":40,
 }
 INK="#eef1f7"; INK2="#9aa6bd"; MUTED="#5e6b86"; PAPER="#0b0e16"; CARD="#10141e"; LINE="#222838"
 PANEL="#161b27"; GOLD="#c8a96a"; ICE="#74c8d8"; RED="#d4806e"; GREEN="#5cc6a0"
@@ -75,7 +75,7 @@ def sample_data():
     budgets=dict(DEFAULTS); spent={c:0.0 for c in DEFAULTS}
     spent.update({"Mortgage / rent":2400,"Childcare":860,"Groceries":512,"Restaurants":296,"Amazon":188,
       "Target":105,"Electric":134,"Misc / discretionary":340,"Church / giving":100,"Pet care":49,
-      "Subscriptions":38,"Water / trash":61,"Car payment":420,"Lawn care":60,"Tolls":20})
+      "Subscriptions":38,"Water / trash":61,"Car payment":420,"Lawn care":45,"Tolls":20})
     return month, budgets, spent, {"count":2,"amount":63.74}, 18
 
 def tile(lab,val,col=INK):

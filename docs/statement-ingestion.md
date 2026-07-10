@@ -34,7 +34,7 @@ Rules that matter (learned the hard way):
   everything double-counts.
 - **Verify outliers against the PDF.** PDF text extraction sometimes grabs the
   wrong number — e.g. a statement's "Eligible Purchases: $X" summary line can get
-  captured as a transaction amount, turning an $82 pizza into $850. After parsing,
+  captured as a transaction amount, turning a $19 lunch into $1,900. After parsing,
   have Claude list the largest transactions per account and eyeball them against
   the actual PDFs before trusting any averages.
 - **One account at a time, then reconcile.** After each statement, compare the

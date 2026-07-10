@@ -21,8 +21,8 @@ A plain 6-month mean gets skewed by single events: one $2,000 TV purchase turns
 
 ## Only amortize genuinely recurring bills
 
-Turning a 6-month insurance premium of $600 into $100/mo is honest — it recurs
-on a fixed schedule. Turning one sporadic $70 charge into "$12/mo" is not; it
+Turning a 6-month insurance premium of $540 into $90/mo is honest — it recurs
+on a fixed schedule. Turning one sporadic $90 charge into "$15/mo" is not; it
 makes a one-off look like a subscription. The test: **would you bet it happens
 again next cycle?** If yes, amortize; if no, exclude it or leave it in Misc.
 
